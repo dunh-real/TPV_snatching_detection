@@ -1,48 +1,224 @@
-1. Cấu trúc thư mục
+﻿# TROMCAP - Traffic Object Recognition and Motion Capture
 
-tromcap/  
-    ├── data/                       # Quản lý dữ liệu (Không đưa lên Git)  
-    │   ├── raw/                    # Video gốc từ CCTV, ảnh chưa xử lý  
-    │   ├── processed/              # Video đã cắt frame, đã qua tiền xử lý  
-    │   ├── annotations/            # File nhãn (YOLO format, COCO, XML...)  
-    │           ├── detection/      # Nhãn cho người, xe máy, vật dụng  
-    │           └── action/         # Nhãn cho hành vi (snatch, run, fight)  
-    │   └── samples/                # Các mẫu nhỏ để test nhanh code  
-    ├── models/                     # Quản lý các file trọng số (.pt, .onnx, .engine)  
-    │   ├── detection/              # Weights của YOLOv8/v10/v11...  
-    │   ├── tracking/               # Config cho ByteTrack/DeepSORT  
-    │   └── action_recognition/     # Weights cho SlowFast/Video Swin Transformer  
-    ├── configs/                    # Cấu hình toàn bộ hệ thống (Cực kỳ quan trọng)  
-    │   ├── detection_config.yaml   # Threshold, class names, input size  
-    │   ├── tracking_config.yaml    # Max objects, buffer size  
-    │   └── camera_config.yaml      # RTSP link, góc quay, tọa độ vùng quan tâm (ROI)  
-    ├── src/                        # Mã nguồn chính (The Core Engine)  
-    │   ├── core/                   # Logic xử lý nền tảng  
-    │   │   ├── detection.py        # Wrapper cho các model Detection  
-    │   │   ├── tracking.py         # Module thực hiện Multi-Object Tracking  
-    │   │   └── action_recognition.py # Module phân tích hành vi theo chuỗi frame  
-    │   ├── pipeline/               # Quy trình chạy luồng (The Pipeline)  
-    │   │   ├── stream_handler.py   # Đọc luồng RTSP, xử lý drop frame, buffering  
-    │   │   ├── inference_engine.py # Kết hợp Detection -> Tracking -> Action  
-    │   │   └── post_processing.py  # Vẽ bounding box, vẽ đường track, vẽ vùng ROI  
-    │   ├── utils/                  # Các công cụ bổ trợ  
-    │   │   ├── visualization.py    # Vẽ annotation lên video để debug  
-    │   │   ├── geometry.py         # Tính toán khoảng cách, va chạm, giao cắt (IOU)  
-    │   │   └── logger.py           # Ghi log hệ thống và các cảnh báo (alerts)  
-    │   ├── api/                    # Interface để bên thứ 3 nhận dữ liệu  
-    │   │   └── alert_service.py    # Gửi thông báo qua Webhook, Telegram, MQTT  
-    │   └── database/               # Lưu trữ lịch sử sự kiện  
-    │       └── event_logger.py     # Lưu metadata về các vụ việc phát hiện được  
-    ├── scripts/                    # Các script hỗ trợ vận hành  
-    │   ├── preprocess_data.py      # Script convert format nhãn hoặc cắt video  
-    │   ├── train_detection.py      # Script kích hoạt quá trình training model  
-    │   └── export_onnx.py          # Chuyển đổi model sang định dạng tối ưu (TensorRT)  
-    ├── deployment/                 # Cấu hình triển khai thực tế  
-    │   ├── docker/                 # Dockerfile cho Edge device hoặc Server  
-    │   ├── edge_config/            # Config riêng cho Jetson Nano/Xavier/Orin  
-    │   └── cloud_config/           # Config cho triển khai trên Cloud (AWS/Azure)  
-    ├── tests/                      # Unit test và Integration test  
-    ├── docs/                       # Tài liệu kỹ thuật, sơ đồ kiến trúc  
-    ├── pyproject.toml              # Quản lý dependencies (uv hoặc poetry)  
-    ├── README.md                   # Hướng dẫn cài đặt và sử dụng  
-    └── .env                        # Biến môi trường (API keys, đường dẫn folder)  
+A computer vision project for object detection, action recognition, and tracking in traffic video analysis using deep learning models.
+
+## Project Overview
+
+TROMCAP is designed to process video data for detecting vehicles/objects, recognizing actions, and tracking movements across frames. The project integrates YOLO-based detection with action recognition and tracking capabilities.
+
+---
+
+## 📁 Project Directory Structure
+
+```
+tromcap/
+├── src/                          # Main source code directory
+│   ├── api/                      # API endpoints and HTTP handlers
+│   ├── core/                     # Core business logic and algorithms
+│   ├── database/                 # Database models and operations
+│   ├── pipeline/                 # Data processing pipelines
+│   ├── services/                 # Service modules
+│   │   └── object_detect.py      # Object detection service
+│   ├── utils/                    # Utility functions and helpers
+│   └── instruction.md            # Source code documentation
+│
+├── models/                       # Pre-trained and custom ML models
+│   ├── action_recognition/       # Action recognition model files
+│   ├── detection/                # Object detection model files
+│   └── tracking/                 # Tracking model files
+│
+├── data/                         # Data directory (gitignored)
+│   ├── raw/                      # Raw input data
+│   ├── processed/                # Processed/cleaned data
+│   ├── images/                   # Image dataset
+│   ├── videos/                   # Video files for processing
+│   │   ├── video_17.mp4
+│   │   ├── video_18.mp4
+│   │   └── ... (video_19-31.mp4)
+│   ├── annotations/              # Annotation files
+│   │   ├── action/               # Action annotations
+│   │   └── detection/            # Detection annotations
+│   ├── labels/                   # Object labels and metadata
+│   ├── samples/                  # Sample data for testing
+│   └── instruction.md            # Data documentation
+│
+├── configs/                      # Configuration files
+│                                 # (Model configs, pipeline configs, etc.)
+│
+├── scripts/                      # Utility and automation scripts
+│                                 # (Training, preprocessing, deployment scripts)
+│
+├── tests/                        # Unit and integration tests
+│                                 # (Test suites for all modules)
+│
+├── docs/                         # Documentation files
+│                                 # (API docs, architecture, usage guides)
+│
+├── deployment/                   # Deployment configurations
+│   ├── docker/                   # Docker containerization
+│   ├── cloud_config/             # Cloud deployment configs
+│   └── edge_config/              # Edge device deployment configs
+│
+├── main.py                       # Main entry point of the application
+├── test.py                       # Test runner script
+├── pyproject.toml               # Project metadata and dependencies
+├── uv.lock                      # Locked dependencies (uv package manager)
+├── .python-version              # Python version specification
+├── .gitignore                   # Git ignore rules
+└── README.md                    # This file
+
+```
+
+---
+
+## 🛠️ Technology Stack
+
+### Core Dependencies
+- **Python**: >= 3.12.10
+- **Ultralytics**: >= 8.4.110 (YOLO object detection)
+- **Ollama**: >= 0.6.2 (LLM integration)
+
+### Machine Learning Components
+- Object Detection (YOLO-based models)
+- Action Recognition
+- Object Tracking
+
+### Development Tools
+- **Package Manager**: uv (modern Python package manager)
+- **Testing**: Custom test.py runner
+
+---
+
+## 📋 Directory Details
+
+### `src/` - Source Code
+Contains the main application logic organized by functionality:
+- **api/**: REST API or interface endpoints
+- **core/**: Core algorithms and business logic
+- **database/**: Data storage and retrieval operations
+- **pipeline/**: Data processing and workflow pipelines
+- **services/**: Service modules for specific tasks (e.g., object_detect.py)
+- **utils/**: Helper functions and utilities
+
+### `models/` - ML Models
+Houses pre-trained and trained model files:
+- **action_recognition/**: Models for action/behavior classification
+- **detection/**: Object detection models (YOLO weights, etc.)
+- **tracking/**: Multi-object tracking models
+
+### `data/` - Dataset Directory
+Contains all input, output, and annotation data:
+- **raw/**: Unprocessed source data
+- **processed/**: Cleaned and processed data
+- **images/**: Image dataset
+- **videos/**: Video files for analysis
+- **annotations/**: Ground truth labels and annotations
+- **labels/**: Object class definitions and metadata
+- **samples/**: Sample data for quick testing
+
+### `configs/` - Configuration Files
+Stores configuration for models, pipelines, and parameters.
+
+### `scripts/` - Automation Scripts
+Utility scripts for:
+- Data preprocessing
+- Model training
+- Evaluation
+- Deployment utilities
+
+### `tests/` - Test Suite
+Unit tests and integration tests for all modules.
+
+### `docs/` - Documentation
+API documentation, architecture diagrams, and usage guides.
+
+### `deployment/` - Deployment Configurations
+- **docker/**: Containerized deployment
+- **cloud_config/**: Cloud platform deployment (AWS, GCP, Azure, etc.)
+- **edge_config/**: Edge device deployment (Jetson, Raspberry Pi, etc.)
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.12.10 or higher
+- Virtual environment (`.venv/`)
+
+### Installation
+```bash
+# Create virtual environment
+python -m venv .venv
+
+# Activate virtual environment
+# On Windows:
+.venv\Scripts\activate
+# On macOS/Linux:
+source .venv/bin/activate
+
+# Install dependencies
+pip install -e .
+# or with uv:
+uv sync
+```
+
+### Running the Project
+```bash
+# Run main application
+python main.py
+
+# Run tests
+python test.py
+```
+
+---
+
+## 📝 Configuration
+
+- Python version: Defined in `.python-version`
+- Dependencies: Listed in `pyproject.toml`
+- Locked versions: Specified in `uv.lock`
+
+---
+
+## 🔍 Key Files
+
+| File | Purpose |
+|------|---------|
+| `main.py` | Application entry point |
+| `test.py` | Test runner |
+| `pyproject.toml` | Project metadata and dependencies |
+| `.gitignore` | Git ignore rules (excludes data/) |
+| `src/instruction.md` | Source code documentation |
+| `data/instruction.md` | Data documentation |
+
+---
+
+## 📚 Documentation
+
+- **Source Code Docs**: See `src/instruction.md`
+- **Data Docs**: See `data/instruction.md`
+- **Full Documentation**: See `docs/` directory
+
+---
+
+## 🔧 Development
+
+The project uses a modular architecture enabling:
+- Independent development of detection, tracking, and action recognition
+- Flexible pipeline configuration
+- Easy deployment to multiple environments (cloud, edge)
+
+---
+
+## 📦 Project Structure Philosophy
+
+```
+Configuration → Pipeline → Models → Output
+                    ↓
+                Services (Detection, Tracking, Recognition)
+```
+
+---
+
+*Last Updated: 2026-08-26*
