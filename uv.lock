@@ -1255,13 +1255,17 @@ name = "tromcap"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "numpy" },
     { name = "ollama" },
+    { name = "opencv-python" },
     { name = "ultralytics" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "numpy", specifier = ">=1.26.0" },
     { name = "ollama", specifier = ">=0.6.2" },
+    { name = "opencv-python", specifier = ">=4.9.0" },
     { name = "ultralytics", specifier = ">=8.4.110" },
 ]
 
