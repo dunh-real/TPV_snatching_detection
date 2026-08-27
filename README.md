@@ -164,8 +164,11 @@ uv sync
 
 ### Running the Project
 ```bash
-# Run main application
-python main.py
+# ByteTrack tuned for short missed detections (default)
+python main.py data/videos/video_11.mp4
+
+# Appearance/ReID profile for deformation and occlusion (slower)
+python main.py data/videos/video_11.mp4 --tracker configs/custom_botsort.yaml
 
 # Run tests
 python test.py

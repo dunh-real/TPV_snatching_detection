@@ -1,4 +1,4 @@
-"""ByteTrack object tracker using ultralytics built-in tracker."""
+"""Object tracker using an Ultralytics tracker configuration."""
 
 import numpy as np
 
@@ -7,25 +7,32 @@ from src.core.models import TrackedObject
 
 
 class ByteTracker:
-    """Wraps YOLO model.track() with ByteTrack for multi-object tracking."""
+    """Wrap YOLO ``model.track()`` while preserving state between frames."""
 
-    def __init__(self, detector: YOLODetector):
+    def __init__(
+        self,
+        detector: YOLODetector,
+        tracker_config: str = "configs/custom_tracker.yaml",
+        tracking_conf: float = 0.1,
+    ):
+        if not 0.0 <= tracking_conf <= 1.0:
+            raise ValueError("tracking_conf must be between 0 and 1")
+
         self.detector = detector
+        self.tracker_config = tracker_config
+        self.tracking_conf = tracking_conf
 
     def update(
         self, frame: np.ndarray, frame_idx: int, timestamp_ms: float
     ) -> list[TrackedObject]:
         """Detect + track objects in a frame, return TrackedObjects filtered by per-class threshold."""
         
-        # Inject missing tracking args if needed due to old model checkpoint
-        if hasattr(self.detector.model, "predictor") and self.detector.model.predictor is not None:
-            if not hasattr(self.detector.model.predictor.args, "fuse_score"):
-                setattr(self.detector.model.predictor.args, "fuse_score", False)
-                
         results = self.detector.model.track(
             frame,
-            conf=self.detector.base_conf,
-            tracker="bytetrack.yaml",
+            # ByteTrack needs low-confidence boxes for its second association pass.
+            # Class-specific thresholds are applied only when results are emitted.
+            conf=self.tracking_conf,
+            tracker=self.tracker_config,
             persist=True,
             verbose=False,
         )

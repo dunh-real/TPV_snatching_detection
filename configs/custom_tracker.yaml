@@ -1,6 +1,7 @@
 tracker_type: bytetrack
-track_high_thresh: 0.4
-track_low_thresh: 0.1
-new_track_thresh: 0.5
-track_buffer: 60      # Tăng lên 60 frames (khoảng 2 giây) để nhớ vật thể lâu hơn
-match_thresh: 0.9
+track_high_thresh: 0.4  # First association uses reliable detections.
+track_low_thresh: 0.1   # Keep weak detections for ByteTrack's recovery pass.
+new_track_thresh: 0.5   # Do not create new IDs from weak/false detections.
+track_buffer: 60        # Keep a lost track for about 2 seconds at 30 FPS.
+match_thresh: 0.9       # More lenient spatial/motion association than the default 0.8.
+fuse_score: true        # Combine detection confidence with IoU during matching.

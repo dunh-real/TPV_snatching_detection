@@ -17,9 +17,11 @@ class DetectionPipeline:
         model_path: str = "models/detection/best_yolov8s.pt",
         db_path: str = "data/detections.db",
         conf: float | dict[str, float] = 0.4,
+        tracker_config: str = "configs/custom_tracker.yaml",
+        tracking_conf: float = 0.1,
     ):
         self.detector = YOLODetector(model_path, conf)
-        self.tracker = ByteTracker(self.detector)
+        self.tracker = ByteTracker(self.detector, tracker_config, tracking_conf)
         self.db = DetectionDB(db_path)
         self.vis = Visualizer()
 
