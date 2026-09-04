@@ -1,0 +1,74 @@
+version: "1.0"
+
+labels:
+  person: person
+  bag: bag
+
+motion:
+  ema_alpha: 0.35
+  velocity_alpha: 0.45
+  acceleration_alpha: 0.35
+  inferred_quality_decay_per_second: 0.75
+  min_dt_seconds: 0.001
+
+identity:
+  person_lost_ttl_seconds: 2.0
+  bag_lost_ttl_seconds: 2.0
+  other_lost_ttl_seconds: 1.0
+  reattach_max_cost: 0.22
+  position_weight: 0.80
+  scale_weight: 0.20
+  new_identity_confidence: 0.55
+
+association:
+  expanded_person_box_ratio: 0.20
+  max_normalized_distance: 0.75
+  min_attach_score: 0.52
+  min_hold_score: 0.38
+  switch_margin: 0.08
+  attach_confirm_seconds: 0.30
+  stable_holder_seconds: 0.80
+  switch_confirm_seconds: 0.30
+  detach_confirm_seconds: 0.50
+  baseline_memory_seconds: 5.0
+  weights:
+    spatial: 0.30
+    previous_holder: 0.25
+    motion: 0.20
+    relative_position: 0.15
+    quality: 0.10
+
+snatch:
+  min_owner_duration_seconds: 0.80
+  approach_max_distance: 2.0
+  approach_min_rate: 0.08
+  approach_min_seconds: 0.20
+  approach_timeout_seconds: 1.50
+  contact_distance: 0.15
+  contact_timeout_seconds: 1.50
+  transfer_window_seconds: 2.0
+  escape_window_seconds: 3.0
+  event_timeout_seconds: 6.0
+  minimum_escape_seconds: 0.40
+  escape_min_separation: 0.75
+  escape_min_rate: 0.05
+  bag_suspect_motion_similarity: 0.45
+  suspect_min_speed: 0.03
+  suspect_acceleration_threshold: 0.05
+  victim_reaction_speed: 0.025
+  min_evidence_quality: 0.35
+  suspected_score_threshold: 7.0
+  scores:
+    stable_holder: 1.0
+    approach: 1.0
+    contact: 1.0
+    bag_decoupled: 2.0
+    new_holder: 2.0
+    holder_switch: 2.0
+    escape: 2.0
+    suspect_acceleration: 1.0
+    victim_reaction: 1.0
+    low_quality_penalty: 1.0
+
+roles:
+  display_role_seconds: 5.0

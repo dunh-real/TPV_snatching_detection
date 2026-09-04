@@ -1,8 +1,9 @@
-"""Detection pipeline: video/image → detect → track → DB → visualize."""
+"""Detection pipeline: input, tracking, rule analytics, storage, visualization."""
 
 import cv2
 from pathlib import Path
 
+from src.analytics.engine import SnatchAnalyticsEngine
 from src.core.detector import YOLODetector
 from src.core.tracker import ByteTracker
 from src.database.operations import DetectionDB
@@ -19,9 +20,14 @@ class DetectionPipeline:
         conf: float | dict[str, float] = 0.4,
         tracker_config: str = "configs/custom_tracker.yaml",
         tracking_conf: float = 0.1,
+        rules_config: str = "configs/snatch_rules.yaml",
+        enable_analytics: bool = True,
     ):
         self.detector = YOLODetector(model_path, conf)
         self.tracker = ByteTracker(self.detector, tracker_config, tracking_conf)
+        self.analytics = (
+            SnatchAnalyticsEngine.from_yaml(rules_config) if enable_analytics else None
+        )
         self.db = DetectionDB(db_path)
         self.vis = Visualizer()
 
@@ -79,6 +85,8 @@ class DetectionPipeline:
 
         video_id = self.db.create_video(source, fps, total)
         self.tracker.reset()
+        if self.analytics:
+            self.analytics.reset()
 
         # Prepare video writer
         writer = None
@@ -92,17 +100,51 @@ class DetectionPipeline:
             )
 
         frame_idx = 0
+        last_timestamp_ms = -1.0
         try:
             while True:
                 ret, frame = cap.read()
                 if not ret:
                     break
 
-                timestamp_ms = cap.get(cv2.CAP_PROP_POS_MSEC)
-                tracked = self.tracker.update(frame, frame_idx, timestamp_ms)
-                self.db.insert_detections(video_id, tracked)
+                reported_timestamp_ms = cap.get(cv2.CAP_PROP_POS_MSEC)
+                expected_timestamp_ms = frame_idx * 1000.0 / fps
+                if reported_timestamp_ms > last_timestamp_ms:
+                    timestamp_ms = reported_timestamp_ms
+                else:
+                    timestamp_ms = max(
+                        expected_timestamp_ms,
+                        last_timestamp_ms + 1000.0 / fps,
+                    )
+                last_timestamp_ms = timestamp_ms
+                tracked = self.tracker.update(
+                    frame,
+                    frame_idx,
+                    timestamp_ms,
+                    include_unreliable=self.analytics is not None,
+                )
+                reliable_tracks = [item for item in tracked if item.is_reliable]
+                self.db.insert_detections(
+                    video_id,
+                    reliable_tracks,
+                    commit=self.analytics is None,
+                )
 
-                vis_frame = self.vis.draw_tracked(frame, tracked)
+                if self.analytics:
+                    analytics_result = self.analytics.update(
+                        tracked,
+                        frame_idx,
+                        timestamp_ms,
+                        frame.shape,
+                    )
+                    self.db.insert_analytics(
+                        video_id,
+                        analytics_result,
+                        self.analytics.config.version,
+                    )
+                    vis_frame = self.vis.draw_analytics(frame, analytics_result)
+                else:
+                    vis_frame = self.vis.draw_tracked(frame, reliable_tracks)
 
                 if writer:
                     writer.write(vis_frame)
@@ -121,5 +163,5 @@ class DetectionPipeline:
             if show:
                 cv2.destroyAllWindows()
 
-        print(f"Done — {frame_idx} frames processed, video_id={video_id}")
+        print(f"Done - {frame_idx} frames processed, video_id={video_id}")
         return video_id

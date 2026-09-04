@@ -22,3 +22,6 @@ class TrackedObject:
     label: str
     frame_idx: int
     timestamp_ms: float
+    # Low-confidence boxes can maintain analytics state without being emitted
+    # as normal detections or triggering an event on their own.
+    is_reliable: bool = True
