@@ -5,23 +5,23 @@ labels:
   bag: bag
 
 motion:
-  ema_alpha: 0.35
-  velocity_alpha: 0.45
-  acceleration_alpha: 0.35
-  inferred_quality_decay_per_second: 0.75
+  ema_alpha: 0.35                           # He so lam muot toa do (vi tri) (EMA)
+  velocity_alpha: 0.45                      # He so lam muot van toc (EMA)
+  acceleration_alpha: 0.35                  # He so lam muot gia toc (EMA)
+  inferred_quality_decay_per_second: 0.75   # He so giam do tin cay cua toa do (vi tri) duoc suy ra theo thoi gian
   min_dt_seconds: 0.001
 
 identity:
-  person_lost_ttl_seconds: 2.0
-  bag_lost_ttl_seconds: 2.0
-  other_lost_ttl_seconds: 1.0
+  person_lost_ttl_seconds: 2.0              # Thoi gian doi voi nguoi bi mat (khong duoc nhan dang) truoc khi xoa khoi danh sach
+  bag_lost_ttl_seconds: 2.0                 # Thoi gian doi voi túi bị mất truoc khi xoa khoi danh sach
+  other_lost_ttl_seconds: 1.0               # Thoi gian doi voi cac doi tuong khac bi mat truoc khi xoa khoi danh sach
   reattach_max_cost: 0.22
   position_weight: 0.80
   scale_weight: 0.20
   new_identity_confidence: 0.55
 
 association:
-  expanded_person_box_ratio: 0.20
+  expanded_person_box_ratio: 0.20   
   max_normalized_distance: 0.75
   min_attach_score: 0.52
   min_hold_score: 0.38
@@ -41,7 +41,7 @@ association:
 snatch:
   min_owner_duration_seconds: 0.80
   approach_max_distance: 2.0
-  approach_min_rate: 0.08
+  approach_min_rate: 0.12
   approach_min_seconds: 0.20
   approach_timeout_seconds: 1.50
   contact_distance: 0.15
@@ -62,7 +62,7 @@ snatch:
     stable_holder: 1.0
     approach: 1.0
     contact: 1.0
-    bag_decoupled: 2.0
+    bag_decoupled: 3.0
     new_holder: 2.0
     holder_switch: 2.0
     escape: 2.0
