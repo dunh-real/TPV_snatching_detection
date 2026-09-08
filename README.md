@@ -198,7 +198,7 @@ Mặc định pipeline video chạy thêm rule engine có trạng thái để:
 Chạy với BoT-SORT/ReID và cấu hình rule mặc định:
 
 ```powershell
-.\.venv\Scripts\python.exe main.py data/videos/video_27.mp4 `
+.\.venv\Scripts\python.exe main.py data/videos/videotest/video_27.mp4 `
   --tracker configs/custom_botsort.yaml `
   --rules-config configs/snatch_rules.yaml
 ```

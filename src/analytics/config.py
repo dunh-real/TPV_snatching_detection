@@ -98,6 +98,8 @@ class SnatchConfig:
 @dataclass(frozen=True)
 class RolesConfig:
     display_role_seconds: float = 5.0
+    grace_period_seconds: float = 1.0
+    confirmed_lock: bool = True
 
 
 @dataclass(frozen=True)

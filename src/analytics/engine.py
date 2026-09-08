@@ -24,7 +24,7 @@ class SnatchAnalyticsEngine:
             config.snatch,
             terminal_retention_seconds=config.roles.display_role_seconds,
         )
-        self.roles = RoleResolver()
+        self.roles = RoleResolver(config.roles)
 
     @classmethod
     def from_yaml(cls, path: str | Path | None = None) -> "SnatchAnalyticsEngine":
@@ -60,7 +60,7 @@ class SnatchAnalyticsEngine:
             timestamp_ms,
             self.config.labels.person,
         )
-        roles = self.roles.update(entities, events, self.config.labels.person)
+        roles = self.roles.update(entities, events, self.config.labels.person, timestamp_ms)
         return AnalyticsResult(
             frame_idx=frame_idx,
             timestamp_ms=timestamp_ms,

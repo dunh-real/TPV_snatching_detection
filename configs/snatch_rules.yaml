@@ -72,3 +72,5 @@ snatch:
 
 roles:
   display_role_seconds: 5.0
+  grace_period_seconds: 1.0
+  confirmed_lock: true
