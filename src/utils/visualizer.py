@@ -20,6 +20,8 @@ class Visualizer:
     def draw_tracked(frame: np.ndarray, objects: list[TrackedObject]) -> np.ndarray:
         """Draw bounding boxes with track ID and label."""
         for obj in objects:
+            # if not getattr(obj, "is_reliable", True) and obj.label == "person" and not draw_low_conf_person:
+            #     continue
             color = COLORS[obj.track_id % len(COLORS)]
             x1, y1, x2, y2 = map(int, obj.bbox)
             cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)

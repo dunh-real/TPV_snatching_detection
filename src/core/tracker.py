@@ -14,6 +14,7 @@ class ByteTracker:
         detector: YOLODetector,
         tracker_config: str = "configs/custom_tracker.yaml",
         tracking_conf: float = 0.1,
+        device: str | int | None = None,
     ):
         if not 0.0 <= tracking_conf <= 1.0:
             raise ValueError("tracking_conf must be between 0 and 1")
@@ -21,6 +22,7 @@ class ByteTracker:
         self.detector = detector
         self.tracker_config = tracker_config
         self.tracking_conf = tracking_conf
+        self.device = device if device is not None else getattr(detector, "device", None)
 
     def update(
         self,
@@ -44,6 +46,7 @@ class ByteTracker:
             tracker=self.tracker_config,
             persist=True,
             verbose=False,
+            device=self.device,
         )
         tracked = []
         for r in results:

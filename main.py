@@ -10,7 +10,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("source", help="Path to a video or image")
     parser.add_argument(
         "--model",
-        default="models/detection/best_yolov8s.pt",
+        default="models/detection/best.pt",
         help="Path to YOLO weights",
     )
     parser.add_argument(
@@ -35,9 +35,9 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Override one detector output threshold for every class",
     )
-    parser.add_argument("--person-conf", type=float, default=0.5)
+    parser.add_argument("--person-conf", type=float, default=0.6)
     parser.add_argument("--bag-conf", type=float, default=0.25)
-    parser.add_argument("--default-conf", type=float, default=0.4)
+    parser.add_argument("--default-conf", type=float, default=0.5)
     parser.add_argument(
         "--rules-config",
         default="configs/snatch_rules.yaml",

@@ -2,10 +2,10 @@
 # It costs more compute than ByteTrack because appearance/ReID is enabled.
 tracker_type: botsort
 track_high_thresh: 0.4
-track_low_thresh: 0.1
-new_track_thresh: 0.5
-track_buffer: 60
-match_thresh: 0.9
+track_low_thresh: 0.2
+new_track_thresh: 0.7
+track_buffer: 50
+match_thresh: 0.8
 fuse_score: true
 
 # These videos use a static CCTV camera, so global-motion compensation is unnecessary.

@@ -9,68 +9,68 @@ motion:
   velocity_alpha: 0.45                      # He so lam muot van toc (EMA)
   acceleration_alpha: 0.35                  # He so lam muot gia toc (EMA)
   inferred_quality_decay_per_second: 0.75   # He so giam do tin cay cua toa do (vi tri) duoc suy ra theo thoi gian
-  min_dt_seconds: 0.001
+  min_dt_seconds: 0.001                     # Khoang thoi gian toi thieu giua hai lan cap nhat (giay)
 
 identity:
   person_lost_ttl_seconds: 2.0              # Thoi gian doi voi nguoi bi mat (khong duoc nhan dang) truoc khi xoa khoi danh sach
   bag_lost_ttl_seconds: 2.0                 # Thoi gian doi voi túi bị mất truoc khi xoa khoi danh sach
   other_lost_ttl_seconds: 1.0               # Thoi gian doi voi cac doi tuong khac bi mat truoc khi xoa khoi danh sach
-  reattach_max_cost: 0.22
-  position_weight: 0.80
-  scale_weight: 0.20
-  new_identity_confidence: 0.55
+  reattach_max_cost: 0.22                   # Chi phi toi da de gan lai doi tuong bi mat vao danh tinh cu
+  position_weight: 0.80                     # Trong so cua do phu hop ve vi tri khi gan lai
+  scale_weight: 0.20                        # Trong so cua do phu hop ve kich thuoc khi gan lai
+  new_identity_confidence: 0.55             # Do tin cay toi thieu de tao danh tinh moi
 
 association:
-  expanded_person_box_ratio: 0.20   
-  max_normalized_distance: 0.75
-  min_attach_score: 0.52
-  min_hold_score: 0.38
-  switch_margin: 0.08
-  attach_confirm_seconds: 0.30
-  stable_holder_seconds: 0.80
-  switch_confirm_seconds: 0.30
-  detach_confirm_seconds: 0.50
-  baseline_memory_seconds: 5.0
+  expanded_person_box_ratio: 0.20            # Ty le mo rong bbox nguoi khi tim tui gan nguoi
+  max_normalized_distance: 0.7               # Khoang cach chuan hoa toi da de xem la co the gan
+  min_attach_score: 0.52                     # Diem toi thieu de gan tui vao mot nguoi
+  min_hold_score: 0.38                       # Diem toi thieu de giu nguoi dang so huu tui
+  switch_margin: 0.08                        # Chenh lech diem toi thieu de doi nguoi so huu
+  attach_confirm_seconds: 0.30               # Thoi gian xac nhan truoc khi gan nguoi moi (giay)
+  stable_holder_seconds: 0.80                # Thoi gian de xac dinh nguoi dang giu tui on dinh (giay)
+  switch_confirm_seconds: 0.30               # Thoi gian xac nhan truoc khi chuyen nguoi so huu (giay)
+  detach_confirm_seconds: 0.50               # Thoi gian xac nhan truoc khi tach tui khoi nguoi (giay)
+  baseline_memory_seconds: 5.0               # Thoi gian luu duong co so de so sanh thay doi (giay)
   weights:
-    spatial: 0.30
-    previous_holder: 0.25
-    motion: 0.20
-    relative_position: 0.15
-    quality: 0.10
+    spatial: 0.30                           # Trong so cua do gan ve khong gian
+    previous_holder: 0.25                   # Trong so cua nguoi so huu truoc do
+    motion: 0.20                            # Trong so cua su phu hop ve chuyen dong
+    relative_position: 0.15                 # Trong so cua vi tri tuong doi tui-nguoi
+    quality: 0.10                           # Trong so cua chat luong du lieu theo doi
 
 snatch:
-  min_owner_duration_seconds: 0.80
-  approach_max_distance: 2.0
-  approach_min_rate: 0.12
-  approach_min_seconds: 0.20
-  approach_timeout_seconds: 1.50
-  contact_distance: 0.15
-  contact_timeout_seconds: 1.50
-  transfer_window_seconds: 2.0
-  escape_window_seconds: 3.0
-  event_timeout_seconds: 6.0
-  minimum_escape_seconds: 0.40
-  escape_min_separation: 0.75
-  escape_min_rate: 0.05
-  bag_suspect_motion_similarity: 0.45
-  suspect_min_speed: 0.03
-  suspect_acceleration_threshold: 0.05
-  victim_reaction_speed: 0.025
-  min_evidence_quality: 0.35
-  suspected_score_threshold: 7.0
+  min_owner_duration_seconds: 0.80           # Thoi gian toi thieu mot nguoi phai giu tui truoc khi xet su kien (giay)
+  approach_max_distance: 2.0                 # Khoang cach toi da de xac dinh dang tiep can
+  approach_min_rate: 0.12                    # Toc do tiep can toi thieu
+  approach_min_seconds: 0.20                 # Thoi gian tiep can toi thieu (giay)
+  approach_timeout_seconds: 1.50              # Thoi gian toi da cho giai doan tiep can (giay)
+  contact_distance: 0.15                     # Khoang cach toi da de xac dinh da tiep xuc
+  contact_timeout_seconds: 1.50              # Thoi gian toi da cho giai doan tiep xuc (giay)
+  transfer_window_seconds: 2.0               # Cua so thoi gian cho viec chuyen tui (giay)
+  escape_window_seconds: 3.0                 # Cua so thoi gian de quan sat hanh vi bo chay (giay)
+  event_timeout_seconds: 6.0                 # Thoi gian toi da cua mot su kien nghi van (giay)
+  minimum_escape_seconds: 0.40               # Thoi gian bo chay toi thieu de tinh la thoat khoi (giay)
+  escape_min_separation: 0.75                # Khoang cach tach toi thieu khi bo chay
+  escape_min_rate: 0.05                      # Toc do tach toi thieu khi bo chay
+  bag_suspect_motion_similarity: 0.45        # Muc tuong dong chuyen dong tui-nguoi de nghi ngo
+  suspect_min_speed: 0.03                    # Toc do toi thieu de danh dau chuyen dong nghi ngo
+  suspect_acceleration_threshold: 0.05        # Gia toc nguong de danh dau hanh vi bat thuong
+  victim_reaction_speed: 0.025               # Toc do toi thieu cua phan ung nguoi bi hai
+  min_evidence_quality: 0.35                 # Chat luong bang chung toi thieu de tinh diem
+  suspected_score_threshold: 7.0             # Tong diem toi thieu de ket luan nghi van
   scores:
-    stable_holder: 1.0
-    approach: 1.0
-    contact: 1.0
-    bag_decoupled: 3.0
-    new_holder: 2.0
-    holder_switch: 2.0
-    escape: 2.0
-    suspect_acceleration: 1.0
-    victim_reaction: 1.0
-    low_quality_penalty: 1.0
+    stable_holder: 1.0                     # Diem cho bang chung nguoi giu tui on dinh
+    approach: 1.0                          # Diem cho bang chung dang tiep can
+    contact: 1.0                           # Diem cho bang chung da tiep xuc
+    bag_decoupled: 3.0                     # Diem cho bang chung tui tach khoi nguoi dang giu
+    new_holder: 2.0                        # Diem cho bang chung xuat hien nguoi giu moi
+    holder_switch: 2.0                    # Diem cho bang chung chuyen nguoi so huu
+    escape: 2.0                            # Diem cho bang chung bo chay
+    suspect_acceleration: 1.0              # Diem cho bang chung gia toc bat thuong
+    victim_reaction: 1.0                   # Diem cho bang chung nguoi bi hai phan ung
+    low_quality_penalty: 1.0               # Muc tru diem khi chat luong theo doi thap
 
 roles:
-  display_role_seconds: 5.0
-  grace_period_seconds: 1.0
-  confirmed_lock: true
+  display_role_seconds: 5.0                 # Thoi gian giu hien thi vai tro sau khi ket thuc su kien (giay)
+  grace_period_seconds: 1.0                 # Thoi gian dung de bo qua mat tam thoi khi xac dinh vai tro (giay)
+  confirmed_lock: true                      # Khoa vai tro da xac nhan, khong doi lai de dang

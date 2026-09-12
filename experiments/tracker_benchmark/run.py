@@ -38,7 +38,7 @@ def parse_args() -> argparse.Namespace:
         description="Compare Ultralytics tracker profiles on project videos without modifying the main DB."
     )
     parser.add_argument("--videos", default="data/videos", help="Video file or directory")
-    parser.add_argument("--model", default="models/detection/best_yolov8s.pt")
+    parser.add_argument("--model", default="models/detection/best.pt")
     parser.add_argument("--output", default="data/tracker_benchmark")
     parser.add_argument("--run-name", default=None, help="Output subdirectory; timestamp if omitted")
     parser.add_argument(
