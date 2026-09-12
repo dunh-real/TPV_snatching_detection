@@ -174,6 +174,52 @@ python main.py data/videos/video_11.mp4 --tracker configs/custom_botsort.yaml
 python test.py
 ```
 
+### Tracker Benchmark
+
+Benchmark ByteTrack, BoT-SORT, OC-SORT, Deep OC-SORT, FastTrack và TrackTrack trên toàn bộ video:
+
+```powershell
+.\.venv\Scripts\python.exe -m experiments.tracker_benchmark.run --videos data/videos
+```
+
+Xem hướng dẫn và ý nghĩa metric tại `experiments/tracker_benchmark/README.md`.
+
+### Person-bag rule engine
+
+Mặc định pipeline video chạy thêm rule engine có trạng thái để:
+
+- nối `raw_track_id` của tracker vào `entity_id` ổn định;
+- duy trì quan hệ holder của từng bag qua các đoạn mất detection ngắn;
+- tính chuyển động đã làm mượt theo thời gian thực;
+- phát hiện chuỗi `approach → contact → holder transfer → escape`;
+- đánh dấu theo sự kiện: `normal`, `possible_victim`, `possible_suspect`,
+  `victim`, `suspect`.
+
+Chạy với BoT-SORT/ReID và cấu hình rule mặc định:
+
+```powershell
+uv run main.py data/videos/videotest/video_27.mp4 `
+  --tracker configs/custom_botsort.yaml `
+  --rules-config configs/snatch_rules.yaml
+```
+
+Chỉ chạy detector/tracker, không chạy analytics:
+
+```powershell
+.\.venv\Scripts\python.exe main.py data/videos/video_27.mp4 --disable-analytics
+```
+
+Kết quả analytics được lưu trong các bảng SQLite:
+
+- `entity_observations`: canonical ID, raw ID và cờ observed/reliable;
+- `bag_person_relations`: holder, baseline holder, candidate và evidence;
+- `snatch_events`: trạng thái, score, victim, suspect và evidence;
+- `person_roles`: role của person theo từng frame.
+
+Các ngưỡng đều dùng giây hoặc tọa độ chuẩn hóa thay vì số frame/pixel cố định.
+Chi tiết module, state machine và hướng dẫn tuning nằm trong
+[`script_rule_engine.md`](script_rule_engine.md).
+
 ---
 
 ## 📝 Configuration
@@ -190,6 +236,8 @@ python test.py
 |------|---------|
 | `main.py` | Application entry point |
 | `test.py` | Test runner |
+| `configs/snatch_rules.yaml` | Rule thresholds and evidence weights |
+| `src/analytics/` | Canonical identity, relation, motion and event engine |
 | `pyproject.toml` | Project metadata and dependencies |
 | `.gitignore` | Git ignore rules (excludes data/) |
 | `src/instruction.md` | Source code documentation |
@@ -223,5 +271,3 @@ Configuration → Pipeline → Models → Output
 ```
 
 ---
-
-*Last Updated: 2026-08-26*

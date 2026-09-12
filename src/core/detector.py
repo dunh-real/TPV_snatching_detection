@@ -9,8 +9,20 @@ from src.core.models import Detection
 class YOLODetector:
     """Wraps ultralytics YOLO for person & bag detection."""
 
-    def __init__(self, model_path: str, conf: float | dict[str, float] = 0.4):
+    def __init__(
+        self,
+        model_path: str,
+        conf: float | dict[str, float] = 0.4,
+        device: str | int | None = None,
+    ):
+        import torch
+
+        self.device = device if device is not None else ("0" if torch.cuda.is_available() else "cpu")
         self.model = YOLO(model_path)
+        try:
+            self.model.to(self.device)
+        except Exception:
+            pass
         self.class_names: dict[int, str] = self.model.names
         
         # Configure thresholds per label
@@ -30,7 +42,7 @@ class YOLODetector:
 
     def detect(self, frame: np.ndarray) -> list[Detection]:
         """Run detection on a single frame (no tracking) with per-class threshold filtering."""
-        results = self.model.predict(frame, conf=self.base_conf, verbose=False)
+        results = self.model.predict(frame, conf=self.base_conf, verbose=False, device=self.device)
         detections = []
         for r in results:
             for box in r.boxes:

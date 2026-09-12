@@ -14,6 +14,7 @@ class ByteTracker:
         detector: YOLODetector,
         tracker_config: str = "configs/custom_tracker.yaml",
         tracking_conf: float = 0.1,
+        device: str | int | None = None,
     ):
         if not 0.0 <= tracking_conf <= 1.0:
             raise ValueError("tracking_conf must be between 0 and 1")
@@ -21,11 +22,21 @@ class ByteTracker:
         self.detector = detector
         self.tracker_config = tracker_config
         self.tracking_conf = tracking_conf
+        self.device = device if device is not None else getattr(detector, "device", None)
 
     def update(
-        self, frame: np.ndarray, frame_idx: int, timestamp_ms: float
+        self,
+        frame: np.ndarray,
+        frame_idx: int,
+        timestamp_ms: float,
+        include_unreliable: bool = False,
     ) -> list[TrackedObject]:
-        """Detect + track objects in a frame, return TrackedObjects filtered by per-class threshold."""
+        """Detect and track objects in one frame.
+
+        By default this preserves the previous public behavior and emits only
+        class-thresholded observations. Analytics can opt into weaker tracked
+        boxes to maintain temporal state without treating them as reliable.
+        """
         
         results = self.detector.model.track(
             frame,
@@ -35,6 +46,7 @@ class ByteTracker:
             tracker=self.tracker_config,
             persist=True,
             verbose=False,
+            device=self.device,
         )
         tracked = []
         for r in results:
@@ -45,8 +57,8 @@ class ByteTracker:
                 confidence = float(box.conf[0])
                 label = self.detector.class_names[cls_id]
                 
-                # Filter by class-specific threshold
-                if confidence >= self.detector.get_threshold(label):
+                is_reliable = confidence >= self.detector.get_threshold(label)
+                if is_reliable or include_unreliable:
                     tracked.append(TrackedObject(
                         track_id=int(tid),
                         bbox=tuple(box.xyxy[0].tolist()),
@@ -55,6 +67,7 @@ class ByteTracker:
                         label=label,
                         frame_idx=frame_idx,
                         timestamp_ms=timestamp_ms,
+                        is_reliable=is_reliable,
                     ))
         return tracked
 
