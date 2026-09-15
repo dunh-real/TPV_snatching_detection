@@ -31,7 +31,6 @@ Hệ thống phân tích video để phát hiện hành vi cướp giật dựa 
 │   ├── cloud_config/                # Cloud deployment configs
 │   └── edge_config/                 # Edge device deployment configs
 │
-├── main.py                          # CLI entry point
 ├── main.py                          # Main entry point of the application
 ├── test.py                          # Test runner script
 ├── pyproject.toml                   # Project metadata and dependencies
