@@ -1,15 +1,15 @@
-"""Facade that executes the complete rule-based analytics pipeline."""
+"""Facade thực thi toàn bộ pipeline analytics dựa trên luật."""
 
 from pathlib import Path
 
-from src.analytics.config import RuleEngineConfig, load_rule_engine_config
-from src.analytics.identity import EntityIdentityManager
-from src.analytics.models import AnalyticsResult
-from src.analytics.person_bag import PersonBagAssociationManager
-from src.analytics.roles import RoleResolver
-from src.analytics.snatch_detector import SnatchDetector
-from src.analytics.trajectory import TrajectoryManager
-from src.core.models import TrackedObject
+from src.core.analytics.config import RuleEngineConfig, load_rule_engine_config
+from src.core.analytics.identity import EntityIdentityManager
+from src.core.analytics.types import AnalyticsResult
+from src.core.analytics.person_bag import PersonBagAssociationManager
+from src.core.analytics.roles import RoleResolver
+from src.core.analytics.snatch_detector import SnatchDetector
+from src.core.analytics.trajectory import TrajectoryManager
+from src.core.types import TrackedObject
 
 
 class SnatchAnalyticsEngine:

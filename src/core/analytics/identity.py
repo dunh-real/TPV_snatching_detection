@@ -1,18 +1,18 @@
-"""Canonical entity IDs layered on top of short-lived tracker IDs."""
+"""Định danh thực thể chuẩn đặt trên các tracker ID có vòng đời ngắn."""
 
 from dataclasses import dataclass, field
 import math
 
-from src.analytics.config import IdentityConfig, LabelsConfig
-from src.analytics.geometry import (
+from src.core.analytics.config import IdentityConfig, LabelsConfig
+from src.core.analytics.geometry import (
     bbox_center,
     bbox_from_relative_offset,
     bbox_size,
     relative_bbox_offset,
     translate_bbox,
 )
-from src.analytics.models import BagPersonRelation, BBox, EntityObservation
-from src.core.models import TrackedObject
+from src.core.analytics.types import BagPersonRelation, EntityObservation
+from src.core.types import BBox, TrackedObject
 
 
 @dataclass

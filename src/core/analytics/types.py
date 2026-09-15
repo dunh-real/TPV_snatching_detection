@@ -1,10 +1,9 @@
-"""Data models shared by the rule-engine analytics modules."""
+"""Các kiểu dữ liệu nghiệp vụ cho analytics người-túi và cướp giật."""
 
 from dataclasses import dataclass, field
 from enum import Enum
 
-
-BBox = tuple[float, float, float, float]
+from src.core.types import BBox
 
 
 class RelationState(str, Enum):

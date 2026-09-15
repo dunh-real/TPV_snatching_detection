@@ -1,12 +1,12 @@
-"""Small test factories for deterministic analytics scenarios."""
+"""Các factory test nhỏ cho những kịch bản analytics xác định."""
 
-from src.analytics.models import (
+from src.core.analytics.types import (
     BagPersonRelation,
     EntityObservation,
     MotionState,
     RelationState,
 )
-from src.core.models import TrackedObject
+from src.core.types import TrackedObject
 
 
 def tracked(

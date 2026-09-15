@@ -1,4 +1,4 @@
-"""Project test runner used by the README quick-start command."""
+"""Trình chạy kiểm thử của dự án dùng trong lệnh khởi động nhanh ở README."""
 
 import sys
 import unittest

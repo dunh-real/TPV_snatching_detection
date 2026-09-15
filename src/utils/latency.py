@@ -1,4 +1,4 @@
-"""Simple latency tracker for pipeline performance measurement."""
+"""Bộ theo dõi độ trễ đơn giản để đo hiệu năng pipeline."""
 
 import time
 from dataclasses import dataclass, field

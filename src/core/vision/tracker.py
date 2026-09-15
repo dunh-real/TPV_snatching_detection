@@ -1,9 +1,9 @@
-"""Object tracker using an Ultralytics tracker configuration."""
+"""Bộ bám vết đối tượng sử dụng cấu hình tracker của Ultralytics."""
 
 import numpy as np
 
-from src.core.detector import YOLODetector
-from src.core.models import TrackedObject
+from src.core.vision.detector import YOLODetector
+from src.core.types import TrackedObject
 
 
 class ByteTracker:

@@ -1,10 +1,10 @@
-"""Visualization utilities for drawing bounding boxes."""
+"""Các tiện ích trực quan hóa để vẽ bounding box."""
 
 import cv2
 import numpy as np
 
-from src.analytics.models import AnalyticsResult, EventState, PersonRole
-from src.core.models import Detection, TrackedObject
+from src.core.analytics.types import AnalyticsResult, EventState, PersonRole
+from src.core.types import Detection, TrackedObject
 
 # Color palette — indexed by track_id % len(COLORS)
 COLORS = [
@@ -17,11 +17,15 @@ class Visualizer:
     """Draws detection / tracking results onto frames."""
 
     @staticmethod
-    def draw_tracked(frame: np.ndarray, objects: list[TrackedObject]) -> np.ndarray:
+    def draw_tracked(
+        frame: np.ndarray,
+        objects: list[TrackedObject],
+        draw_low_conf_person: bool = True,
+    ) -> np.ndarray:
         """Draw bounding boxes with track ID and label."""
         for obj in objects:
-            # if not getattr(obj, "is_reliable", True) and obj.label == "person" and not draw_low_conf_person:
-            #     continue
+            if not getattr(obj, "is_reliable", True) and obj.label == "person" and not draw_low_conf_person:
+                continue
             color = COLORS[obj.track_id % len(COLORS)]
             x1, y1, x2, y2 = map(int, obj.bbox)
             cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
@@ -48,7 +52,11 @@ class Visualizer:
         return frame
 
     @staticmethod
-    def draw_analytics(frame: np.ndarray, result: AnalyticsResult) -> np.ndarray:
+    def draw_analytics(
+        frame: np.ndarray,
+        result: AnalyticsResult,
+        draw_low_conf_person: bool = True,
+    ) -> np.ndarray:
         """Draw canonical IDs, person roles, holder links, and event alerts."""
         entities_by_id = {item.entity_id: item for item in result.entities}
         relations_by_bag = {item.bag_id: item for item in result.relations}
@@ -65,6 +73,8 @@ class Visualizer:
 
         for entity in result.entities:
             if not entity.observed:
+                continue
+            if not entity.reliable and entity.label == "person" and not draw_low_conf_person:
                 continue
             x1, y1, x2, y2 = map(int, entity.bbox)
             if entity.entity_id in result.roles:

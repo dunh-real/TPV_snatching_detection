@@ -2,8 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from src.analytics.config import load_rule_engine_config
-from src.analytics.geometry import (
+from src.core.analytics.config import load_rule_engine_config
+from src.core.analytics.geometry import (
     bbox_from_relative_offset,
     normalized_point_to_person_distance,
     relative_bbox_offset,

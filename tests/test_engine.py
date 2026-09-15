@@ -1,8 +1,8 @@
 import unittest
 
-from src.analytics.config import RuleEngineConfig
-from src.analytics.engine import SnatchAnalyticsEngine
-from src.analytics.models import PersonRole, RelationState
+from src.core.analytics.config import RuleEngineConfig
+from src.core.analytics.types import PersonRole, RelationState
+from src.services.snatch_analytics import SnatchAnalyticsEngine
 from tests.helpers import tracked
 
 

@@ -1,12 +1,15 @@
-"""Data models for detection and tracking."""
+"""Các kiểu dữ liệu dùng chung cho adapter phát hiện và bám vết."""
 
 from dataclasses import dataclass
+
+
+BBox = tuple[float, float, float, float]
 
 
 @dataclass
 class Detection:
     """Raw detection result from YOLO."""
-    bbox: tuple[float, float, float, float]  # x1, y1, x2, y2
+    bbox: BBox  # x1, y1, x2, y2
     confidence: float
     class_id: int
     label: str
@@ -16,7 +19,7 @@ class Detection:
 class TrackedObject:
     """Detection enriched with tracking ID and timestamp."""
     track_id: int
-    bbox: tuple[float, float, float, float]  # x1, y1, x2, y2
+    bbox: BBox  # x1, y1, x2, y2
     confidence: float
     class_id: int
     label: str

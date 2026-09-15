@@ -1,11 +1,11 @@
-"""Smoothed online kinematics for canonical tracked entities."""
+"""Động học trực tuyến đã làm mượt cho các thực thể được bám vết chuẩn."""
 
 from dataclasses import dataclass
 import math
 
-from src.analytics.config import MotionConfig
-from src.analytics.geometry import bbox_center, normalized_scale
-from src.analytics.models import EntityObservation, MotionState
+from src.core.analytics.config import MotionConfig
+from src.core.analytics.geometry import bbox_center, normalized_scale
+from src.core.analytics.types import EntityObservation, MotionState
 
 
 @dataclass
@@ -92,7 +92,6 @@ class TrajectoryManager:
             if entity_id in active_ids
         }
         return result
-
 
     # Tinh toan trang thai chuyen dong cua doi tuong hien tai dua tren trang thai truoc do va quan sat hien tai
     # input:  previous: trang thai truoc do cua doi tuong, 

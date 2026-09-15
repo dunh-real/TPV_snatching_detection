@@ -1,8 +1,8 @@
 import unittest
 
-from src.analytics.config import IdentityConfig, LabelsConfig, MotionConfig
-from src.analytics.identity import EntityIdentityManager
-from src.analytics.trajectory import TrajectoryManager
+from src.core.analytics.config import IdentityConfig, LabelsConfig, MotionConfig
+from src.core.analytics.identity import EntityIdentityManager
+from src.core.analytics.trajectory import TrajectoryManager
 from tests.helpers import entity, tracked
 
 

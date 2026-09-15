@@ -1,9 +1,9 @@
 import unittest
 
-from src.analytics.config import SnatchConfig
-from src.analytics.models import EventState, PersonRole, RelationState
-from src.analytics.roles import RoleResolver
-from src.analytics.snatch_detector import SnatchDetector
+from src.core.analytics.config import SnatchConfig
+from src.core.analytics.types import EventState, PersonRole, RelationState
+from src.core.analytics.roles import RoleResolver
+from src.core.analytics.snatch_detector import SnatchDetector
 from tests.helpers import entity, motion, relation
 
 

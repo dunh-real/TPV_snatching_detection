@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from src.analytics.models import (
+from src.core.analytics.types import (
     AnalyticsResult,
     BagPersonRelation,
     EventState,

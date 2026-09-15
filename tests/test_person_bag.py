@@ -1,8 +1,8 @@
 import unittest
 
-from src.analytics.config import AssociationConfig, LabelsConfig
-from src.analytics.models import RelationState
-from src.analytics.person_bag import PersonBagAssociationManager
+from src.core.analytics.config import AssociationConfig, LabelsConfig
+from src.core.analytics.types import RelationState
+from src.core.analytics.person_bag import PersonBagAssociationManager
 from tests.helpers import entity, motion
 
 

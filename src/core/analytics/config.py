@@ -1,4 +1,4 @@
-"""Typed configuration loader for the person-bag rule engine."""
+"""Bộ nạp cấu hình có kiểu dữ liệu cho rule engine người-túi."""
 
 from dataclasses import dataclass, field, fields
 from pathlib import Path

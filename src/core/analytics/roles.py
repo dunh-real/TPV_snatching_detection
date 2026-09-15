@@ -1,9 +1,9 @@
-"""Resolve event-scoped hypotheses into one display role per person."""
+"""Chuyển các giả thuyết theo sự kiện thành một vai trò hiển thị cho mỗi người."""
 
 from dataclasses import dataclass
 
-from src.analytics.config import RolesConfig
-from src.analytics.models import (
+from src.core.analytics.config import RolesConfig
+from src.core.analytics.types import (
     EntityObservation,
     EventState,
     PersonRole,

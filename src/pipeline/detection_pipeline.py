@@ -1,12 +1,11 @@
-"""Detection pipeline: input, tracking, rule analytics, storage, visualization."""
+"""Pipeline phát hiện: đầu vào, bám vết, rule analytics, lưu trữ và trực quan hóa."""
 
 import cv2
 from pathlib import Path
 
-from src.analytics.engine import SnatchAnalyticsEngine
-from src.core.detector import YOLODetector
-from src.core.tracker import ByteTracker
 from src.database.operations import DetectionDB
+from src.services.object_detect import ObjectDetectionService
+from src.services.snatch_analytics import SnatchAnalyticsEngine
 from src.utils.latency import LatencyTracker
 from src.utils.visualizer import Visualizer
 
@@ -24,8 +23,15 @@ class DetectionPipeline:
         rules_config: str = "configs/snatch_rules.yaml",
         enable_analytics: bool = True,
     ):
-        self.detector = YOLODetector(model_path, conf)
-        self.tracker = ByteTracker(self.detector, tracker_config, tracking_conf)
+        self.object_detection = ObjectDetectionService(
+            model_path,
+            conf,
+            tracker_config,
+            tracking_conf,
+        )
+        # Preserve the existing public attributes for callers that use them.
+        self.detector = self.object_detection.detector
+        self.tracker = self.object_detection.tracker
         self.analytics = (
             SnatchAnalyticsEngine.from_yaml(rules_config) if enable_analytics else None
         )
@@ -57,7 +63,7 @@ class DetectionPipeline:
             raise FileNotFoundError(f"Cannot read image: {source}")
 
         video_id = self.db.create_video(source, fps=0, total_frames=1)
-        detections = self.detector.detect(frame)
+        detections = self.object_detection.detect(frame)
         self.latency_tracker.mark_tracking_done()
 
         vis_frame = self.vis.draw_detections(frame, detections)
@@ -92,7 +98,7 @@ class DetectionPipeline:
         h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
         video_id = self.db.create_video(source, fps, total)
-        self.tracker.reset()
+        self.object_detection.reset()
         if self.analytics:
             self.analytics.reset()
         self.latency_tracker.reset()
@@ -127,7 +133,7 @@ class DetectionPipeline:
                         last_timestamp_ms + 1000.0 / fps,
                     )
                 last_timestamp_ms = timestamp_ms
-                tracked = self.tracker.update(
+                tracked = self.object_detection.track(
                     frame,
                     frame_idx,
                     timestamp_ms,

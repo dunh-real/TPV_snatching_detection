@@ -1,22 +1,22 @@
-"""Temporal person-bag holder association with hysteresis."""
+"""Liên kết người giữ túi theo thời gian với cơ chế hysteresis."""
 
 from dataclasses import dataclass, field
 import math
 
-from src.analytics.config import AssociationConfig, LabelsConfig
-from src.analytics.geometry import (
+from src.core.analytics.config import AssociationConfig, LabelsConfig
+from src.core.analytics.types import (
+    BagPersonRelation,
+    EntityObservation,
+    MotionState,
+    RelationState,
+)
+from src.core.analytics.geometry import (
     bbox_center,
     bbox_size,
     cosine_similarity,
     expand_bbox,
     point_to_bbox_distance,
     relative_bbox_offset,
-)
-from src.analytics.models import (
-    BagPersonRelation,
-    EntityObservation,
-    MotionState,
-    RelationState,
 )
 
 

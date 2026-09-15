@@ -1,8 +1,8 @@
-"""Small, dependency-free geometry helpers used by analytics."""
+"""Các tiện ích hình học nhỏ, không phụ thuộc ngoài, cho analytics và tracking."""
 
 import math
 
-from src.analytics.models import BBox
+from src.core.types import BBox
 
 
 def bbox_center(bbox: BBox) -> tuple[float, float]:

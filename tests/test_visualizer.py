@@ -2,8 +2,13 @@ import unittest
 from unittest.mock import patch
 import numpy as np
 
-from src.analytics.models import AnalyticsResult, EntityObservation, PersonRole, RoleAssignment
-from src.core.models import TrackedObject
+from src.core.analytics.types import (
+    AnalyticsResult,
+    EntityObservation,
+    PersonRole,
+    RoleAssignment,
+)
+from src.core.types import TrackedObject
 from src.utils.visualizer import Visualizer
 
 

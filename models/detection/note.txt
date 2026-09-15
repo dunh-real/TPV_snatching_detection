@@ -1,0 +1,1 @@
+import model ở file src/service/object_detect.py

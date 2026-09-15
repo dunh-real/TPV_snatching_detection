@@ -1,9 +1,9 @@
-"""YOLOv8 object detector wrapper."""
+"""Lớp bọc bộ phát hiện đối tượng YOLOv8."""
 
 import numpy as np
 from ultralytics import YOLO
 
-from src.core.models import Detection
+from src.core.types import Detection
 
 
 class YOLODetector:

@@ -1,1 +1,1 @@
-"""Unit tests for TROMCAP."""
+"""Các kiểm thử đơn vị cho TROMCAP."""

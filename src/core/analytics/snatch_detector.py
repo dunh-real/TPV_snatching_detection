@@ -1,22 +1,22 @@
-"""Explainable temporal rules for suspected bag-snatching events."""
+"""Các luật theo thời gian có thể giải thích cho sự kiện nghi ngờ cướp giật túi."""
 
 from dataclasses import dataclass, field
 import math
 
-from src.analytics.config import SnatchConfig
-from src.analytics.geometry import (
-    bbox_center,
-    cosine_similarity,
-    normalized_center_distance,
-    normalized_person_distance,
-    normalized_point_to_person_distance,
-)
-from src.analytics.models import (
+from src.core.analytics.config import SnatchConfig
+from src.core.analytics.types import (
     BagPersonRelation,
     EntityObservation,
     EventState,
     MotionState,
     SnatchEvent,
+)
+from src.core.analytics.geometry import (
+    bbox_center,
+    cosine_similarity,
+    normalized_center_distance,
+    normalized_person_distance,
+    normalized_point_to_person_distance,
 )
 
 

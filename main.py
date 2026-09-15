@@ -1,4 +1,4 @@
-"""TROMCAP command-line entry point."""
+"""Điểm vào dòng lệnh của TROMCAP."""
 
 import argparse
 
