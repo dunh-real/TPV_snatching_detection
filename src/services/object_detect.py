@@ -16,12 +16,14 @@ class ObjectDetectionService:
         conf: float | dict[str, float] = 0.6,
         tracker_config: str = "configs/custom_tracker.yaml",
         tracking_conf: float = 0.1,
+        device: str | int | None = None,
     ):
-        self.detector = YOLODetector(model_path=model_path, conf=conf)
+        self.detector = YOLODetector(model_path=model_path, conf=conf, device=device)
         self.tracker = ByteTracker(
             detector=self.detector,
             tracker_config=tracker_config,
             tracking_conf=tracking_conf,
+            device=device,
         )
 
     def detect(self, frame: np.ndarray) -> list[Detection]:

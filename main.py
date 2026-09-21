@@ -20,7 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--tracker",
-        default="configs/custom_tracker.yaml",
+        default="configs/custom_botsort.yaml",
         help="Path to an Ultralytics tracker YAML configuration",
     )
     parser.add_argument(
@@ -50,7 +50,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--output-dir",
-        default="data/output_video",
+        default="data/output_video/vd",
         help="Annotated output directory; pass an empty string to disable",
     )
     parser.add_argument("--show", action="store_true", help="Show live annotated frames")

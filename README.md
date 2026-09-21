@@ -102,6 +102,24 @@ uv run main.py data/videos/video_27.mp4 --disable-analytics
 uv run python test.py
 ```
 
+## Benchmark nhiều camera trên một GPU
+
+Chạy trên Colab T4 hoặc server NVIDIA (nên đặt video trên ổ đĩa local, không đọc trực tiếp từ Google Drive):
+
+```bash
+uv run python experiments/benchmark_concurrent.py \
+  --videos data/videos/videotest \
+  --counts 1 2 4 6 \
+  --duration 120 \
+  --device 0
+```
+
+Mỗi camera được mô phỏng bằng một process với YOLO/tracker/rule engine/SQLite riêng. Decoder phát frame theo FPS của video, hàng đợi tối đa 2 frame và bỏ frame cũ khi quá tải. Video ngắn sẽ được phát lặp; trạng thái tracker/rule engine được reset ở đầu mỗi vòng. Nên dùng video đại diện dài ít nhất bằng `--duration` để tránh tác động của việc lặp. Mặc định benchmark **có analytics và SQLite**, vẽ nhãn nhưng không ghi MP4; thêm `--write-video` để đo cả chi phí mã hóa/ghi video. Dùng `--fps 15` để kiểm tra kịch bản camera 15 FPS, `--no-db` để cô lập chi phí lưu trữ, hoặc `--device cpu` để smoke test khi không có GPU.
+
+Kết quả nằm trong `data/benchmark_results/concurrent/<run>/report.json` (chi tiết từng camera), `summary.csv` (so sánh 1/2/4/... camera) và `cameras_<n>/resource_samples.csv` (tài nguyên theo thời gian). Một mức tải chỉ PASS nếu **mọi camera** xử lý ít nhất 95% frame đến hạn và p95 độ trễ từ lúc frame đến đến khi hoàn tất không quá 500 ms; chỉnh bằng `--min-delivery` và `--latency-sla-ms`. Theo dõi thêm frame bị rơi, FPS tổng, CPU cores, RAM của worker, GPU utilization và VRAM đỉnh. GPU metrics từ `nvidia-smi` là của **cả GPU**, nên tránh chạy tác vụ GPU khác khi đo. Đây là mô phỏng từ file video, chưa bao gồm RTSP/network jitter và chưa dùng GPU batch inference.
+
+Một số bản OpenCV/FFmpeg không đọc ổn định video AV1 (`video_01.mp4` trong tập mẫu là AV1). Nếu decoder báo lỗi, kiểm tra bằng `ffprobe` rồi dùng video H.264 hoặc chuyển mã trước khi benchmark, ví dụ `ffmpeg -i input.mp4 -c:v libx264 -pix_fmt yuv420p -an output.mp4`. Không tính thời gian chuyển mã vào kết quả benchmark.
+
 ## Cấu hình và kết quả
 
 - `configs/snatch_rules.yaml`: ngưỡng, trọng số evidence và version của rule engine.
