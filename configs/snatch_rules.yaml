@@ -8,6 +8,7 @@ motion:
   ema_alpha: 0.35                           # He so lam muot toa do (vi tri) (EMA)
   velocity_alpha: 0.45                      # He so lam muot van toc (EMA)
   acceleration_alpha: 0.35                  # He so lam muot gia toc (EMA)
+  reference_fps: 30.0                       # FPS tham chieu de EMA khong phu thuoc frame rate
   inferred_quality_decay_per_second: 0.75   # He so giam do tin cay cua toa do (vi tri) duoc suy ra theo thoi gian
   min_dt_seconds: 0.001                     # Khoang thoi gian toi thieu giua hai lan cap nhat (giay)
 
@@ -31,6 +32,7 @@ association:
   switch_confirm_seconds: 0.30               # Thoi gian xac nhan truoc khi chuyen nguoi so huu (giay)
   detach_confirm_seconds: 0.50               # Thoi gian xac nhan truoc khi tach tui khoi nguoi (giay)
   baseline_memory_seconds: 5.0               # Thoi gian luu duong co so de so sanh thay doi (giay)
+  confidence_decay_per_second: 0.05           # He so giam confidence moi giay khi mat lien ket
   weights:
     spatial: 0.30                           # Trong so cua do gan ve khong gian
     previous_holder: 0.25                   # Trong so cua nguoi so huu truoc do

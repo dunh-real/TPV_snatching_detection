@@ -52,16 +52,20 @@ class ByteTracker:
         for r in results:
             if r.boxes.id is None:
                 continue
-            for box, tid in zip(r.boxes, r.boxes.id):
-                cls_id = int(box.cls[0])
-                confidence = float(box.conf[0])
+            # Tracked rows are [x1, y1, x2, y2, track_id, confidence, class].
+            # Copy the batch once instead of synchronizing CUDA for every scalar.
+            rows = r.boxes.data.detach().cpu().numpy()
+            for row in rows:
+                cls_id = int(row[-1])
+                confidence = float(row[-2])
+                track_id = int(row[-3])
                 label = self.detector.class_names[cls_id]
                 
                 is_reliable = confidence >= self.detector.get_threshold(label)
                 if is_reliable or include_unreliable:
                     tracked.append(TrackedObject(
-                        track_id=int(tid),
-                        bbox=tuple(box.xyxy[0].tolist()),
+                        track_id=track_id,
+                        bbox=tuple(float(value) for value in row[:4]),
                         confidence=confidence,
                         class_id=cls_id,
                         label=label,

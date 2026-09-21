@@ -18,6 +18,7 @@ class MotionConfig:
     ema_alpha: float = 0.35
     velocity_alpha: float = 0.45
     acceleration_alpha: float = 0.35
+    reference_fps: float = 30.0
     inferred_quality_decay_per_second: float = 0.75
     min_dt_seconds: float = 1e-3
 
@@ -54,6 +55,7 @@ class AssociationConfig:
     switch_confirm_seconds: float = 0.30
     detach_confirm_seconds: float = 0.50
     baseline_memory_seconds: float = 5.0
+    confidence_decay_per_second: float = 0.05
     weights: AssociationWeights = field(default_factory=AssociationWeights)
 
 
@@ -118,6 +120,8 @@ class RuleEngineConfig:
             raise ValueError("motion.ema_alpha must be in (0, 1]")
         if not 0.0 < self.motion.velocity_alpha <= 1.0:
             raise ValueError("motion.velocity_alpha must be in (0, 1]")
+        if self.motion.reference_fps <= 0.0:
+            raise ValueError("motion.reference_fps must be positive")
         if not 0.0 < self.motion.inferred_quality_decay_per_second <= 1.0:
             raise ValueError(
                 "motion.inferred_quality_decay_per_second must be in (0, 1]"
@@ -126,6 +130,10 @@ class RuleEngineConfig:
             raise ValueError("identity.reattach_max_cost must be positive")
         if self.association.switch_confirm_seconds < 0.0:
             raise ValueError("association.switch_confirm_seconds cannot be negative")
+        if not 0.0 < self.association.confidence_decay_per_second <= 1.0:
+            raise ValueError(
+                "association.confidence_decay_per_second must be in (0, 1]"
+            )
         if self.snatch.suspected_score_threshold <= 0.0:
             raise ValueError("snatch.suspected_score_threshold must be positive")
 

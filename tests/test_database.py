@@ -17,6 +17,33 @@ from tests.helpers import entity, motion
 
 
 class AnalyticsDatabaseTests(unittest.TestCase):
+    def test_analytics_commit_can_be_deferred_for_frame_batching(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            db_path = Path(directory) / "batched.db"
+            database = DetectionDB(str(db_path))
+            video_id = database.create_video("input.mp4", 30.0, 30)
+            database.insert_analytics(
+                video_id,
+                self._result(EventState.ESCAPING, frame_idx=1),
+                "test-rules",
+                commit=False,
+            )
+
+            reader = sqlite3.connect(db_path)
+            try:
+                self.assertEqual(
+                    reader.execute("SELECT COUNT(*) FROM entity_observations").fetchone()[0],
+                    0,
+                )
+                database.commit()
+                self.assertEqual(
+                    reader.execute("SELECT COUNT(*) FROM entity_observations").fetchone()[0],
+                    3,
+                )
+            finally:
+                reader.close()
+                database.close()
+
     def test_analytics_result_is_persisted_and_event_is_updated(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             db_path = Path(directory) / "analytics.db"

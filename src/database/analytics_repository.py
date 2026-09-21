@@ -17,6 +17,8 @@ class AnalyticsRepository:
         video_id: int,
         result: AnalyticsResult,
         rules_version: str,
+        *,
+        commit: bool = True,
     ) -> None:
         entity_rows = [
             (
@@ -128,7 +130,8 @@ class AnalyticsRepository:
                    VALUES (?,?,?,?,?,?,?)""",
                 role_rows,
             )
-        self._con.commit()
+        if commit:
+            self._con.commit()
 
     def get_entity_observations(self, video_id: int) -> list[dict]:
         return self._fetch_rows(

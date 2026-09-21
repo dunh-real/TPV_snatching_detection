@@ -11,7 +11,7 @@ from src.core.analytics.geometry import (
     relative_bbox_offset,
     translate_bbox,
 )
-from src.core.analytics.types import BagPersonRelation, EntityObservation
+from src.core.analytics.types import BagPersonRelation, EntityObservation, RelationState
 from src.core.types import BBox, TrackedObject
 
 
@@ -123,9 +123,12 @@ class EntityIdentityManager:
     ) -> None:
         """Remember bag position relative to its holder for the next frame."""
         by_id = {item.entity_id: item for item in observations}
-        active_bag_ids: set[int] = set()
         for relation in relations:
-            if relation.holder_person_id is None:
+            if (
+                relation.holder_person_id is None
+                or relation.state in {RelationState.DETACHED, RelationState.UNASSOCIATED}
+            ):
+                self._bag_anchors.pop(relation.bag_id, None)
                 continue
             bag = by_id.get(relation.bag_id)
             holder = by_id.get(relation.holder_person_id)
@@ -135,7 +138,6 @@ class EntityIdentityManager:
                 holder_person_id=holder.entity_id,
                 relative_offset=relative_bbox_offset(bag.bbox, holder.bbox),
             )
-            active_bag_ids.add(relation.bag_id)
 
         self._bag_anchors = {
             bag_id: anchor
@@ -203,7 +205,7 @@ class EntityIdentityManager:
         observations: list[EntityObservation] = []
         for track, entity_id, identity_confidence in mapped:
             self._update_record(entity_id, track, timestamp_ms)
-            self._raw_to_entity[(track.label, track.track_id)] = entity_id
+            self._bind_raw_track(track, entity_id)
             observations.append(
                 EntityObservation(
                     entity_id=entity_id,
@@ -220,6 +222,22 @@ class EntityIdentityManager:
                 )
             )
         return observations
+
+    def _bind_raw_track(self, track: TrackedObject, entity_id: int) -> None:
+        """Make the current raw track the entity's only active tracker alias."""
+        raw_key = (track.label, track.track_id)
+        previous_entity_id = self._raw_to_entity.get(raw_key)
+        if previous_entity_id is not None and previous_entity_id != entity_id:
+            previous = self._records.get(previous_entity_id)
+            if previous is not None:
+                previous.raw_track_ids.discard(track.track_id)
+        self._raw_to_entity = {
+            mapped_key: mapped_id
+            for mapped_key, mapped_id in self._raw_to_entity.items()
+            if mapped_id != entity_id or mapped_key == raw_key
+        }
+        self._raw_to_entity[raw_key] = entity_id
+        self._records[entity_id].raw_track_ids = {track.track_id}
 
     def _create_record(self, track: TrackedObject, timestamp_ms: float) -> int:
         entity_id = self._next_entity_id

@@ -40,9 +40,17 @@ class DetectionDB:
         video_id: int,
         result: AnalyticsResult,
         rules_version: str,
+        *,
+        commit: bool = True,
     ) -> None:
         """Persist one frame of explainable analytics output."""
-        self._analytics.insert_analytics(video_id, result, rules_version)
+        self._analytics.insert_analytics(
+            video_id, result, rules_version, commit=commit
+        )
+
+    def commit(self) -> None:
+        """Commit the current frame batch as one SQLite transaction."""
+        self._con.commit()
 
     def get_detections(self, video_id: int) -> list[dict]:
         """Return all detections for a video, ordered by frame."""

@@ -144,8 +144,14 @@ class RoleResolver:
                     confidence=identity_conf,
                 )
 
-        # Purge memory for persons no longer visible.
+        # Tentative roles may be forgotten after their grace period, but a
+        # confirmed role must survive a temporary camera occlusion.
         self._memory = {
-            pid: mem for pid, mem in self._memory.items() if pid in person_ids
+            pid: mem
+            for pid, mem in self._memory.items()
+            if pid in person_ids
+            or (mem.role in _CONFIRMED_ROLES and self.config.confirmed_lock)
+            or current_ms is None
+            or (current_ms - mem.last_active_ms) <= grace_ms
         }
         return roles

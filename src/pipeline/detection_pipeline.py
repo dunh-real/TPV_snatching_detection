@@ -22,7 +22,11 @@ class DetectionPipeline:
         tracking_conf: float = 0.1,
         rules_config: str = "configs/snatch_rules.yaml",
         enable_analytics: bool = True,
+        db_commit_interval_frames: int = 30,
     ):
+        if db_commit_interval_frames < 1:
+            raise ValueError("db_commit_interval_frames must be at least 1")
+        self.db_commit_interval_frames = db_commit_interval_frames
         self.object_detection = ObjectDetectionService(
             model_path,
             conf,
@@ -145,7 +149,7 @@ class DetectionPipeline:
                 self.db.insert_detections(
                     video_id,
                     reliable_tracks,
-                    commit=self.analytics is None,
+                    commit=False,
                 )
 
                 if self.analytics:
@@ -159,10 +163,14 @@ class DetectionPipeline:
                         video_id,
                         analytics_result,
                         self.analytics.config.version,
+                        commit=False,
                     )
                     vis_frame = self.vis.draw_analytics(frame, analytics_result)
                 else:
                     vis_frame = self.vis.draw_tracked(frame, reliable_tracks)
+
+                if (frame_idx + 1) % self.db_commit_interval_frames == 0:
+                    self.db.commit()
 
                 if writer:
                     writer.write(vis_frame)
@@ -180,6 +188,7 @@ class DetectionPipeline:
                         f"[Tracking: {track_ms:.1f}ms | Analytics+Post: {post_ms:.1f}ms | Total: {total_ms:.1f}ms (~{fps_est:.1f} FPS)]"
                     )
         finally:
+            self.db.commit()
             cap.release()
             if writer:
                 writer.release()

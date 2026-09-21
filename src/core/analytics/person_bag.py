@@ -34,6 +34,7 @@ class _RelationRecord:
     detach_since_ms: float | None = None
     last_switch_ms: float | None = None
     previous_holder_duration_seconds: float = 0.0
+    last_update_ms: float | None = None
     last_relative_offsets: dict[int, tuple[float, float, float, float]] = field(
         default_factory=dict
     )
@@ -66,7 +67,13 @@ class PersonBagAssociationManager:
                 bag.entity_id, _RelationRecord(bag_id=bag.entity_id)
             )
             scores = self._candidate_scores(record, bag, people, motions)
-            self._advance_record(record, bag, people, scores, timestamp_ms)
+            elapsed_seconds = self._elapsed_seconds(
+                timestamp_ms, record.last_update_ms
+            )
+            self._advance_record(
+                record, bag, people, scores, timestamp_ms, elapsed_seconds
+            )
+            record.last_update_ms = timestamp_ms
             relations.append(self._snapshot(record, scores, timestamp_ms))
 
         # The identity manager owns the lifetime of a bag. Once it stops
@@ -125,6 +132,7 @@ class PersonBagAssociationManager:
         people: list[EntityObservation],
         scores: dict[int, float],
         timestamp_ms: float,
+        elapsed_seconds: float,
     ) -> None:
         people_by_id = {person.entity_id: person for person in people}
         current_score = scores.get(record.holder_person_id, 0.0)
@@ -133,7 +141,9 @@ class PersonBagAssociationManager:
         if not bag.observed:
             if record.holder_person_id is not None:
                 record.state = RelationState.LOST_ATTACHED
-                record.confidence *= 0.92
+                record.confidence *= (
+                    self.config.confidence_decay_per_second**elapsed_seconds
+                )
             return
 
         if record.holder_person_id is None:
@@ -154,7 +164,7 @@ class PersonBagAssociationManager:
                 record.candidate_since_ms = None
                 record.detach_since_ms = None
             else:
-                self._advance_detach(record, timestamp_ms)
+                self._advance_detach(record, timestamp_ms, elapsed_seconds)
 
         holder = people_by_id.get(record.holder_person_id)
         if holder is not None and record.state == RelationState.ATTACHED:
@@ -227,11 +237,16 @@ class PersonBagAssociationManager:
         record.candidate_since_ms = None
         record.detach_since_ms = None
 
-    def _advance_detach(self, record: _RelationRecord, timestamp_ms: float) -> None:
+    def _advance_detach(
+        self,
+        record: _RelationRecord,
+        timestamp_ms: float,
+        elapsed_seconds: float,
+    ) -> None:
         if record.detach_since_ms is None:
             record.detach_since_ms = timestamp_ms
         record.state = RelationState.LOST_ATTACHED
-        record.confidence *= 0.9
+        record.confidence *= self.config.confidence_decay_per_second**elapsed_seconds
         if (
             self._elapsed_seconds(timestamp_ms, record.detach_since_ms)
             < self.config.detach_confirm_seconds

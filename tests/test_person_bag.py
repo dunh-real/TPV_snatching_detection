@@ -43,6 +43,27 @@ class PersonBagAssociationTests(unittest.TestCase):
         self.assertEqual(switched.previous_holder_id, 1)
         self.assertEqual(switched.baseline_holder_id, 1)
 
+    def test_confidence_decay_depends_on_time_not_frame_count(self) -> None:
+        config = AssociationConfig(detach_confirm_seconds=10.0)
+        frequent = PersonBagAssociationManager(config, LabelsConfig())
+        sparse = PersonBagAssociationManager(config, LabelsConfig())
+
+        def update(manager, timestamp_ms, bag_x):
+            observations = [
+                entity(1, "person", (100.0, 100.0, 300.0, 500.0), timestamp_ms),
+                entity(3, "bag", (bag_x, 300.0, bag_x + 50.0, 380.0), timestamp_ms),
+            ]
+            motions = {item.entity_id: motion(item.entity_id) for item in observations}
+            return manager.update(observations, motions, timestamp_ms)[0]
+
+        for manager in (frequent, sparse):
+            update(manager, 0.0, 220.0)
+            update(manager, 400.0, 220.0)
+        update(frequent, 500.0, 800.0)
+        frequent_result = update(frequent, 900.0, 800.0)
+        sparse_result = update(sparse, 900.0, 800.0)
+        self.assertAlmostEqual(frequent_result.confidence, sparse_result.confidence)
+
 
 if __name__ == "__main__":
     unittest.main()

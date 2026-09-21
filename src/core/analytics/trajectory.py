@@ -8,6 +8,11 @@ from src.core.analytics.geometry import bbox_center, normalized_scale
 from src.core.analytics.types import EntityObservation, MotionState
 
 
+def _time_adjusted_alpha(alpha: float, dt: float, reference_fps: float) -> float:
+    """Keep EMA response constant when frame intervals change."""
+    return 1.0 - (1.0 - alpha) ** (dt * reference_fps)
+
+
 @dataclass
 class _TrajectoryState:      # Trang thai vet chuyen dong cua tung doi tuong
     timestamp_ms: float         # Thoi gian hien tai cua doi tuong (ms)
@@ -114,7 +119,9 @@ class TrajectoryManager:
         if observation.observed:
             # lam muot vi tri bang EMA: lay trung binh co trong so giua vi tri quan sat hien tai va vi tri muot cua frame truoc
             # -> Giam rung lac bounding box
-            alpha = self.config.ema_alpha
+            alpha = _time_adjusted_alpha(
+                self.config.ema_alpha, dt, self.config.reference_fps
+            )
             x = alpha * measured_x + (1.0 - alpha) * previous.x
             y = alpha * measured_y + (1.0 - alpha) * previous.y
             scale = alpha * measured_scale + (1.0 - alpha) * previous.scale
@@ -123,7 +130,9 @@ class TrajectoryManager:
             raw_vx = (x - previous.x) / dt
             raw_vy = (y - previous.y) / dt
             raw_scale_velocity = (scale - previous.scale) / dt
-            velocity_alpha = self.config.velocity_alpha
+            velocity_alpha = _time_adjusted_alpha(
+                self.config.velocity_alpha, dt, self.config.reference_fps
+            )
             vx = velocity_alpha * raw_vx + (1.0 - velocity_alpha) * previous.vx
             vy = velocity_alpha * raw_vy + (1.0 - velocity_alpha) * previous.vy
             scale_velocity = (
@@ -134,7 +143,9 @@ class TrajectoryManager:
             # Tinh gia toc tho (raw) va gia toc muot (smoothed) bang EMA
             raw_ax = (vx - previous.vx) / dt
             raw_ay = (vy - previous.vy) / dt
-            acceleration_alpha = self.config.acceleration_alpha
+            acceleration_alpha = _time_adjusted_alpha(
+                self.config.acceleration_alpha, dt, self.config.reference_fps
+            )
             ax = acceleration_alpha * raw_ax + (1.0 - acceleration_alpha) * previous.ax
             ay = acceleration_alpha * raw_ay + (1.0 - acceleration_alpha) * previous.ay
 

@@ -61,11 +61,19 @@ class SnatchDetectorTests(unittest.TestCase):
         self.assertEqual(suspected[0].victim_person_id, 1)
         self.assertEqual(suspected[0].suspect_person_id, 2)
 
-        roles = RoleResolver().update(
-            self._observations(1700.0, 600.0, 630.0), suspected, "person"
+        resolver = RoleResolver()
+        roles = resolver.update(
+            self._observations(1700.0, 600.0, 630.0), suspected, "person", 1700.0
         )
         self.assertEqual(roles[1].role, PersonRole.VICTIM)
         self.assertEqual(roles[2].role, PersonRole.SUSPECT)
+
+        resolver.update([], [], "person", 2000.0)
+        returned = resolver.update(
+            self._observations(2200.0, 600.0, 630.0), [], "person", 2200.0
+        )
+        self.assertEqual(returned[1].role, PersonRole.VICTIM)
+        self.assertEqual(returned[2].role, PersonRole.SUSPECT)
 
     def test_contact_without_transfer_is_cancelled(self) -> None:
         owner_relation = relation(1)

@@ -45,15 +45,17 @@ class YOLODetector:
         results = self.model.predict(frame, conf=self.base_conf, verbose=False, device=self.device)
         detections = []
         for r in results:
-            for box in r.boxes:
-                cls_id = int(box.cls[0])
-                confidence = float(box.conf[0])
+            # One device-to-host transfer for all boxes avoids a GPU sync per field.
+            rows = r.boxes.data.detach().cpu().numpy()
+            for row in rows:
+                cls_id = int(row[-1])
+                confidence = float(row[-2])
                 label = self.class_names[cls_id]
                 
                 # Filter by class-specific threshold
                 if confidence >= self.get_threshold(label):
                     detections.append(Detection(
-                        bbox=tuple(box.xyxy[0].tolist()),
+                        bbox=tuple(float(value) for value in row[:4]),
                         confidence=confidence,
                         class_id=cls_id,
                         label=label,
